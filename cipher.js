@@ -8,7 +8,7 @@ export function encryptBlock(plainText, key) {
     if (key.length !== 32) {
         throw new RangeError(`key length [${key.length}] != 32`)
     }
-    let state = plainText.slice(0, 8)
+    let state = plainText
     for (let round = 0; round < 8; ++round) {
         let roundKey = extractRoundKey(round, key);
         state = processRound(
