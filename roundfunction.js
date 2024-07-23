@@ -26,10 +26,14 @@ function subRoundKey(key, index) {
 function performSubRound(state, key) {
     if ((key & 0b1000) === 0) {
         // 0xxx
-        let rotationAmount = (key & 0x7) + 1
-        return ror(state, rotationAmount)
+        let rotationAmount = (key & 0b0111) + 1
+        return rotateRight(state, rotationAmount)
     } else if ((key & 0b1100) === 0b1000) {
         // 10xx
         return undefined // TODO
     }
+}
+
+function rotateRight(value, n) {
+    return (value >> n) | (value << (4 - n))
 }
