@@ -1,6 +1,6 @@
 # funcrypt
 
-## A weak symmetric cipher modeled modeled after 20th century ciphers, using a Feistel network.
+### A weak symmetric cipher modeled modeled after 20th century ciphers, using a Feistel network.
 
 Please do not attempt to make it stronger by increasing the number of rounds or internal rounds, block length, or key length. Any such attempt will only make it slower but not more secure.
 
