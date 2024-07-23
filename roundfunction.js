@@ -24,11 +24,11 @@ function subRoundKey(key, index) {
 // 111x shuffle by one out of two provided shuffles
 
 function performSubRound(state, key) {
-    if ((key & 0x8) === 0) {
+    if ((key & 0b1000) === 0) {
         // 0xxx
         let rotationAmount = (key & 0x7) + 1
         return ror(state, rotationAmount)
-    } else if ((key & 0xc) === 0x8) {
+    } else if ((key & 0b1100) === 0b1000) {
         // 10xx
         return undefined // TODO
     }
