@@ -1,3 +1,6 @@
+// 4 substitutions,
+// each consisting of 8 value mappings,
+// one for each nibble (4 bits) of a half-block of 32 bits
 export const substitutions = [
     [
         [6, 10, 12, 0, 14, 7, 1, 13, 5, 2, 4, 8, 11, 15, 9, 3],
