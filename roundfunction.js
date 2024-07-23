@@ -19,9 +19,8 @@ function subRoundKey(key, index) {
 
 // half = 16 bits (half of a1)
 // 0xxx ror by 1-9
-// 10xx xor the halves after negating none/left/right/both
-// 110x xor the halves after optionally counter-rotating by 8 bits
-// 111x shuffle by one out of two provided shuffles
+// 10xx apply one out of 4 sets of 8 fixed or provided substitutions
+// 11xx shuffle using one out of 4 fixed or provided shuffles
 
 function performSubRound(state, key) {
     if ((key & 0b1000) === 0) {
