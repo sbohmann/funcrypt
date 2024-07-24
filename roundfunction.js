@@ -43,7 +43,7 @@ function performSubRound(state, key) {
 }
 
 function rotateRight(state, n) {
-    let value = (((((state[0] << 4) | state[1]) << 4) | state[2]) << 4) | state[3]
+    let value = (((((state[0] << 8) | state[1]) << 8) | state[2]) << 8) | state[3]
     let result = (value >>> n) | (value << (4 - n))
     return [(result >>> 24) & 0xff, (result >>> 16) & 0xff, (result >>> 8) & 0xff, result & 0xff]
 }
