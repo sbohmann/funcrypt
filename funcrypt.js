@@ -1,4 +1,3 @@
-import * as crypto from 'crypto'
 import * as fs from 'fs'
 
 import { encryptBlock } from './cipher.js'
@@ -10,7 +9,30 @@ if (plainText.length !== 8) {
     process.exit(1)
 }
 
-let key = crypto.randomBytes(32)
+if (process.argv.length !== 4 || process.argv[2] !== '-key') {
+    exitWithArgumentSyntaxDescription()
+}
+
+const expectedKeyStringLength = 64;
+let key = []
+let keyString = process.argv[3]
+if (keyString.length !== expectedKeyStringLength) {
+    exitWithArgumentSyntaxDescription(`Key description length ${keyString.length} != ${expectedKeyStringLength}`)
+}
+for (let index = 0; index < expectedKeyStringLength; index += 2) {
+    let keyByteSubstring = keyString.slice(index, index + 2);
+    let keyByte = Number.parseInt(keyByteSubstring, 16)
+    if (Number.isNaN(keyByte)) {
+        exitWithArgumentSyntaxDescription(`Found invalid sequence ${keyByteSubstring} in key`)
+    }
+    key.push(keyByte)
+}
+
+function exitWithArgumentSyntaxDescription(message) {
+    console.error(message)
+    console.error("Expected arguments: -key <key>, key being 256 bytes in hexadecimal notation")
+    process.exit(1)
+}
 
 let cipherText = encryptBlock(plainText, key)
 
