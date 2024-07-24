@@ -20,7 +20,7 @@ function subRoundKey(key, index) {
     return (key[byteIndex] >>> shift) & 0x0f
 }
 
-// half = 16 bits (half of a1)
+// half = 16 bits (half of an)
 // 0xxx ror by 1-9
 // 10xx apply one out of 4 sets of 8 fixed or provided substitutions
 // 11xx shuffle using one out of 2 fixed or provided shuffles
@@ -33,26 +33,36 @@ function performSubRound(state, key) {
         // 10xx
         let substitutionIndex = key & 0b0011
         return substitute(state, substitutionIndex)
-    } else if ((key & 0b1110) === 0b1100) {
+    } else if ((key & 0b1100) === 0b1100) {
         // 10xx
-        let shuffleIndex = key & 0b0001
-        return shuffle(state, shuffleIndex)
+        let shuffleIndex = key & 0b0011
+        return shuffleBytes(state, shuffleIndex)
     } else {
         throw new RangeError("Programming error. This block should be unreachable")
     }
 }
 
-function rotateRight(value, n) {
-    return (value >>> n) | (value << (4 - n))
+function rotateRight(state, n) {
+    let value = (((((state[0] << 4) | state[1]) << 4) | state[2]) << 4) | state[3]
+    let result = (value >>> n) | (value << (4 - n))
+    return [(result >>> 24) & 0xff, (result >>> 16) & 0xff, (result >>> 8) & 0xff, result & 0xff]
 }
 
 function substitute(state, substitutionIndex) {
     let substitution = substitutions[substitutionIndex]
-    let result = 0
-    for (let nibbleIndex = 0; nibbleIndex < 8; ++nibbleIndex) {
-        let originalNibbleValue = nibbleForIndex(state, nibbleIndex)
-        result <<= 4
-        result |= substituteNibble(originalNibbleValue, substitution, nibbleIndex)
+    let result = []
+    for (let byteIndex = 0; byteIndex < 4; ++byteIndex) {
+        let highNibbleIndex = byteIndex * 2;
+        let highNibble = substituteNibble(
+            nibbleForIndex(state, highNibbleIndex),
+            substitution,
+            highNibbleIndex)
+        let lowNibbleIndex = byteIndex * 2 + 1;
+        let lowNibble = substituteNibble(
+            nibbleForIndex(state, lowNibbleIndex),
+            substitution,
+            lowNibbleIndex)
+        result.push(highNibble << 4 | lowNibble)
     }
     return result
 }
@@ -61,7 +71,7 @@ function nibbleForIndex(state, nibbleIndex) {
     let originalByteIndex = nibbleIndex / 2
     let originalByte = state[originalByteIndex]
     return (nibbleIndex % 2 === 0
-        ? (originalByte & 0xf0) >>> 4
+        ? (originalByte >>> 4) & 0xf
         : originalByte & 0xf)
 }
 
@@ -73,13 +83,12 @@ function substituteNibble(nibble, substitution, nibbleIndex) {
     return substitutionForPart[nibble]
 }
 
-function shuffle(state, shuffleIndex) {
+function shuffleBytes(state, shuffleIndex) {
     let shuffle = shuffles[shuffleIndex]
-    let result = 0
+    let result = []
     for (let byteIndex = 0; byteIndex < 4; ++byteIndex) {
-        let originalByteValue = state[byteIndex]
-        result <<= 4
-        result |= substituteNibble(originalByteValue, shuffle, byteIndex)
+        let shuffledIndex = shuffle[byteIndex];
+        result.push(state[shuffledIndex])
     }
     return result
 }

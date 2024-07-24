@@ -16,8 +16,8 @@ function shuffledArray(input) {
 }
 
 process.stdout.write(`const shuffles = [`)
-for (let block = 0; block < 8; ++block) {
-    process.stdout.write(block === 0 ? '\n  [' : ',\n  [')
+for (let shuffle = 0; shuffle < 4; ++shuffle) {
+    process.stdout.write(shuffle === 0 ? '\n  [' : ',\n  [')
     process.stdout.write(`  ${shuffledArray(values)}`)
     process.stdout.write('  ]')
 }

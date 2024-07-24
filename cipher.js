@@ -1,5 +1,5 @@
-import {roundFunction} from './roundfunction'
-import {xor} from './bufferoperations'
+import {roundFunction} from './roundfunction.js'
+import {xor} from './bitwiseoperations.js'
 
 export function encryptBlock(plainText, key) {
     if (plainText.length < 8) {
@@ -15,6 +15,7 @@ export function encryptBlock(plainText, key) {
             state,
             state => roundFunction(state, roundKey))
     }
+    return state
 }
 
 function extractRoundKey(round, rawKey) {
@@ -30,5 +31,5 @@ function processRound(state, f) {
     let aOut = bIn
     let bOut = xor(aIn, f(bIn))
 
-    return Buffer.concat([aOut, bOut])
+    return [...aOut, ...bOut]
 }
