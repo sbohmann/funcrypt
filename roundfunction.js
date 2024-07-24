@@ -13,11 +13,11 @@ export function roundFunction(inputState, key) {
 }
 
 function subRoundKey(key, index) {
-    let byteIndex = index / 2
+    let byteIndex = Math.floor(index / 2)
     let shift  = (index % 2  === 0)
         ? 4
         : 0
-    return (key[byteIndex] >>> shift) & 0x0f
+    return (key[byteIndex] >>> shift) & 0xf
 }
 
 // half = 16 bits (half of an)
@@ -25,17 +25,22 @@ function subRoundKey(key, index) {
 // 10xx apply one out of 4 sets of 8 fixed or provided substitutions
 // 11xx shuffle using one out of 2 fixed or provided shuffles
 function performSubRound(state, key) {
-    if ((key & 0b1000) === 0) {
+    let parameter = key
+    for (let value of state) {
+        let shortValue = ((value >> 4) ^ value) & 0xf
+        parameter ^= shortValue
+    }
+    if ((parameter & 0b1000) === 0) {
         // 0xxx
-        let rotationAmount = (key & 0b0111) + 1
+        let rotationAmount = (parameter & 0b0111) + 1
         return rotateRight(state, rotationAmount)
-    } else if ((key & 0b1100) === 0b1000) {
+    } else if ((parameter & 0b1100) === 0b1000) {
         // 10xx
-        let substitutionIndex = key & 0b0011
+        let substitutionIndex = parameter & 0b0011
         return substitute(state, substitutionIndex)
-    } else if ((key & 0b1100) === 0b1100) {
+    } else if ((parameter & 0b1100) === 0b1100) {
         // 10xx
-        let shuffleIndex = key & 0b0011
+        let shuffleIndex = parameter & 0b0011
         return shuffleBytes(state, shuffleIndex)
     } else {
         throw new RangeError("Programming error. This block should be unreachable")
