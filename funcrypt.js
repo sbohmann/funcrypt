@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 
-import { encryptBlock } from './cipher.js'
+import {encryptBlock} from './cipher.js'
+import {shuffleKey} from "./shufflekey.js";
 
 let plainText = Array.from(fs.readFileSync(0))
 
@@ -27,6 +28,7 @@ for (let index = 0; index < expectedKeyStringLength; index += 2) {
     }
     key.push(keyByte)
 }
+shuffleKey(key)
 
 function exitWithArgumentSyntaxDescription(message) {
     console.error(message)
